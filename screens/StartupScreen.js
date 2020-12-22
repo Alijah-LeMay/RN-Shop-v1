@@ -1,46 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 
-import {
-  View,
-  ActivityIndicator,
-  StyleSheet,
-  AsyncStorage,
-} from 'react-native';
-import { useDispatch } from 'react-redux';
-import Colors from '../constants/Colors';
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage'
+import { useDispatch } from 'react-redux'
+import Colors from '../constants/Colors'
 
 const StartupScreen = (props) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     //below is how you use async in useEffect. other places might use .then in the app.
     const tryLogin = async () => {
-      const userData = await AsyncStorage.getItem('userData');
+      const userData = await AsyncStorage.getItem('userData')
       if (!userData) {
-        props.navigation.navigate('Auth');
-        return;
+        props.navigation.navigate('Auth')
+        return
       }
-      const transformedData = JSON.parse(userData);
-      const { token, userId, expiryDate } = transformedData;
-      const expirationDate = new Date(expiryDate);
+      const transformedData = JSON.parse(userData)
+      const { token, userId, expiryDate } = transformedData
+      const expirationDate = new Date(expiryDate)
 
       if (expirationDate <= new Date() || !token || !userId) {
-        props.navigation.navigate('Auth');
-        return;
+        props.navigation.navigate('Auth')
+        return
       }
-      const expirationTime = expirationDate.getTime() - new Date().getTime();
-      props.navigation.navigate('Shop');
-      dispatch(authenticate(userId, token, expirationTime));
-    };
-    tryLogin();
-  }, [dispatch]);
+      const expirationTime = expirationDate.getTime() - new Date().getTime()
+      props.navigation.navigate('Shop')
+      dispatch(authenticate(userId, token, expirationTime))
+    }
+    tryLogin()
+  }, [dispatch])
 
   return (
     <View style={styles.screen}>
       <ActivityIndicator size='large' color={Colors.primary} />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   screen: {
@@ -48,6 +44,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+})
 
-export default StartupScreen;
+export default StartupScreen
