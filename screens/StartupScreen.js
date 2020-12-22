@@ -4,16 +4,17 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import { useDispatch } from 'react-redux'
 import Colors from '../constants/Colors'
+import { authenticate, setDidTryAl } from '../store/actions/auth'
 
 const StartupScreen = (props) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    //below is how you use async in useEffect. other places might use .then in the app.
     const tryLogin = async () => {
       const userData = await AsyncStorage.getItem('userData')
       if (!userData) {
-        props.navigation.navigate('Auth')
+        // props.navigation.navigate('Auth');
+        dispatch(setDidTryAl())
         return
       }
       const transformedData = JSON.parse(userData)
@@ -21,13 +22,17 @@ const StartupScreen = (props) => {
       const expirationDate = new Date(expiryDate)
 
       if (expirationDate <= new Date() || !token || !userId) {
-        props.navigation.navigate('Auth')
+        // props.navigation.navigate('Auth');
+        dispatch(setDidTryAl())
         return
       }
+
       const expirationTime = expirationDate.getTime() - new Date().getTime()
-      props.navigation.navigate('Shop')
+
+      // props.navigation.navigate('Shop');
       dispatch(authenticate(userId, token, expirationTime))
     }
+
     tryLogin()
   }, [dispatch])
 

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback, useReducer } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { createProduct, updateProduct } from '../../store/actions/products'
-
 import {
+  View,
   ScrollView,
   StyleSheet,
   Platform,
@@ -11,8 +9,10 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+import { useSelector, useDispatch } from 'react-redux'
 
 import HeaderButton from '../../components/UI/HeaderButton'
+import * as productsActions from '../../store/actions/products'
 import Input from '../../components/UI/Input'
 import Colors from '../../constants/Colors'
 
@@ -34,17 +34,18 @@ const formReducer = (state, action) => {
     }
     return {
       formIsValid: updatedFormIsValid,
-      ...state,
+      inputValidities: updatedValidities,
       inputValues: updatedValues,
     }
   }
   return state
 }
 
-const EditProductsScreen = (props) => {
+const EditProductScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState()
-  const prodId = props.navigation.getParam('productid')
+
+  const prodId = props.route.params ? props.route.params.productId : null
   const editedProduct = useSelector((state) =>
     state.products.userProducts.find((prod) => prod.id === prodId)
   )
@@ -68,14 +69,14 @@ const EditProductsScreen = (props) => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Something went wrong!', error, [{ text: 'Okay' }])
+      Alert.alert('An error occurred!', error, [{ text: 'Okay' }])
     }
   }, [error])
 
   const submitHandler = useCallback(async () => {
     if (!formState.formIsValid) {
       Alert.alert('Wrong input!', 'Please check the errors in the form.', [
-        { text: 'okay' },
+        { text: 'Okay' },
       ])
       return
     }
@@ -84,7 +85,7 @@ const EditProductsScreen = (props) => {
     try {
       if (editedProduct) {
         await dispatch(
-          updateProduct(
+          productsActions.updateProduct(
             prodId,
             formState.inputValues.title,
             formState.inputValues.description,
@@ -93,7 +94,7 @@ const EditProductsScreen = (props) => {
         )
       } else {
         await dispatch(
-          createProduct(
+          productsActions.createProduct(
             formState.inputValues.title,
             formState.inputValues.description,
             formState.inputValues.imageUrl,
@@ -110,8 +111,20 @@ const EditProductsScreen = (props) => {
   }, [dispatch, prodId, formState])
 
   useEffect(() => {
-    props.navigation.setParams({ submit: submitHandler })
-  }, [])
+    props.navigation.setOptions({
+      headerRight: () => (
+        <HeaderButtons HeaderButtonComponent={HeaderButton}>
+          <Item
+            title='Save'
+            iconName={
+              Platform.OS === 'android' ? 'md-checkmark' : 'ios-checkmark'
+            }
+            onPress={submitHandler}
+          />
+        </HeaderButtons>
+      ),
+    })
+  }, [submitHandler])
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -124,6 +137,7 @@ const EditProductsScreen = (props) => {
     },
     [dispatchFormState]
   )
+
   if (isLoading) {
     return (
       <View style={styles.centered}>
@@ -131,10 +145,11 @@ const EditProductsScreen = (props) => {
       </View>
     )
   }
+
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }} //must be here
-      behavior='padding'
+      style={{ flex: 1 }}
+      behavior={Platform == 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={100}
     >
       <ScrollView>
@@ -142,7 +157,7 @@ const EditProductsScreen = (props) => {
           <Input
             id='title'
             label='Title'
-            errorText='Please enter a valid title'
+            errorText='Please enter a valid title!'
             keyboardType='default'
             autoCapitalize='sentences'
             autoCorrect
@@ -155,7 +170,7 @@ const EditProductsScreen = (props) => {
           <Input
             id='imageUrl'
             label='Image Url'
-            errorText='Please enter a valid image URL'
+            errorText='Please enter a valid image url!'
             keyboardType='default'
             returnKeyType='next'
             onInputChange={inputChangeHandler}
@@ -167,17 +182,18 @@ const EditProductsScreen = (props) => {
             <Input
               id='price'
               label='Price'
-              errorText='Please enter a valid price'
-              onInputChange={inputChangeHandler}
+              errorText='Please enter a valid price!'
               keyboardType='decimal-pad'
               returnKeyType='next'
+              onInputChange={inputChangeHandler}
+              required
               min={0.1}
             />
           )}
           <Input
             id='description'
             label='Description'
-            errorText='Please enter a valid description'
+            errorText='Please enter a valid description!'
             keyboardType='default'
             autoCapitalize='sentences'
             autoCorrect
@@ -194,23 +210,12 @@ const EditProductsScreen = (props) => {
     </KeyboardAvoidingView>
   )
 }
-EditProductsScreen.navigationOptions = (navData) => {
-  const submitFn = navData.navigation.getParam('submit')
+
+// EditProductScreen.navigationOptions = (navData)
+export const screenOptions = (navData) => {
+  const routeParams = navData.route.params ? navData.route.params : {}
   return {
-    headerTitle: navData.navigation.getParam('productId')
-      ? 'Edit Product'
-      : 'Add Product',
-    headerRight: () => (
-      <HeaderButtons HeaderButtonComponent={HeaderButton}>
-        <Item
-          title='Save'
-          iconName={
-            Platform.OS === 'android' ? 'md-checkmark' : 'ios-checkmark'
-          }
-          onPress={submitFn}
-        />
-      </HeaderButtons>
-    ),
+    headerTitle: routeParams.productId ? 'Edit Product' : 'Add Product',
   }
 }
 
@@ -225,4 +230,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default EditProductsScreen
+export default EditProductScreen

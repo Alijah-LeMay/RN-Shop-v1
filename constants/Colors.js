@@ -1,4 +1,6 @@
 export default {
   primary: '#C2185B',
-  accent: '#ffc107',
-};
+  accent: '#FFC107',
+  buttonLight: '#ccc',
+  buttonTextDark: 'black',
+}

@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react'
-
 import {
-  FlatList,
-  Platform,
-  Button,
-  ActivityIndicator,
   View,
-  StyleSheet,
   Text,
+  FlatList,
+  Button,
+  Platform,
+  ActivityIndicator,
+  StyleSheet,
 } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+
 import HeaderButton from '../../components/UI/HeaderButton'
-import ProductItem from '../../components/shop/ProductItem'
-import { addToCart } from '../../store/actions/cart'
+import ProductItem from '../../components/shop/ProductItem_Previews/ProductItem'
+import * as cartActions from '../../store/actions/cart'
+import * as productsActions from '../../store/actions/products'
 import Colors from '../../constants/Colors'
-import { fetchProducts } from '../../store/actions/products'
+import ProductItem_Mini from '../../components/shop/ProductItem_Previews/ProductItem_Mini'
 
 const ProductsOverviewScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -23,14 +24,12 @@ const ProductsOverviewScreen = (props) => {
   const [error, setError] = useState()
   const products = useSelector((state) => state.products.availableProducts)
   const dispatch = useDispatch()
-  //useEffect below runs only first time screen is loaded, to fetch products
 
-  //create a ddummy function inside useEffect because useEffect MUST NOT return a promise, which using async does.
   const loadProducts = useCallback(async () => {
     setError(null)
     setIsRefreshing(true)
     try {
-      await dispatch(fetchProducts)
+      await dispatch(productsActions.fetchProducts())
     } catch (err) {
       setError(err.message)
     }
@@ -38,10 +37,10 @@ const ProductsOverviewScreen = (props) => {
   }, [dispatch, setIsLoading, setError])
 
   useEffect(() => {
-    const willFocusSub = props.navigation.addListener('willFocus', loadProducts) // runs loadProducts on the scenario that another screen is about to be focused.
+    const unsubscribe = props.navigation.addListener('focus', loadProducts)
 
     return () => {
-      willFocusSub.remove()
+      unsubscribe()
     }
   }, [loadProducts])
 
@@ -52,19 +51,26 @@ const ProductsOverviewScreen = (props) => {
     })
   }, [dispatch, loadProducts])
 
-  const selectItemHandler = () => {
+  const selectItemHandler = (id, title) => {
     props.navigation.navigate('ProductDetail', {
       productId: id,
       productTitle: title,
     })
   }
+
   if (error) {
     return (
       <View style={styles.centered}>
-        <Text>An error occured!</Text>
+        <Text>An error occurred!</Text>
+        <Button
+          title='Try again'
+          onPress={loadProducts}
+          color={Colors.primary}
+        />
       </View>
     )
   }
+
   if (isLoading) {
     return (
       <View style={styles.centered}>
@@ -72,6 +78,7 @@ const ProductsOverviewScreen = (props) => {
       </View>
     )
   }
+
   if (!isLoading && products.length === 0) {
     return (
       <View style={styles.centered}>
@@ -79,43 +86,62 @@ const ProductsOverviewScreen = (props) => {
       </View>
     )
   }
+
   return (
+    // <FlatList
+    //   onRefresh={loadProducts}
+    //   refreshing={isRefreshing}
+    //   data={products}
+    //   keyExtractor={(item) => item.id}
+    //   renderItem={(itemData) => (
+    //     <ProductItem
+    //       image={itemData.item.imageUrl}
+    //       title={itemData.item.title}
+    //       price={itemData.item.price}
+    //       onSelect={() => {
+    //         selectItemHandler(itemData.item.id, itemData.item.title);
+    //       }}
+    //     >
+    //       <Button
+    //         color={Colors.primary}
+    //         title='View Details'
+    //         onPress={() => {
+    //           selectItemHandler(itemData.item.id, itemData.item.title);
+    //         }}
+    //       />
+    //       <Button
+    //         color={Colors.primary}
+    //         title='To Cart'
+    //         onPress={() => {
+    //           dispatch(cartActions.addToCart(itemData.item));
+    //         }}
+    //       />
+    //     </ProductItem>
+    ///>
+    //  );
+    //  };
+
     <FlatList
-      refreshing={isLoading}
+      numColumns={3}
       onRefresh={loadProducts}
+      refreshing={isRefreshing}
       data={products}
       keyExtractor={(item) => item.id}
       renderItem={(itemData) => (
-        <ProductItem
+        <ProductItem_Mini
           image={itemData.item.imageUrl}
-          title={itemData.item.title}
-          price={itemData.item.price}
           onSelect={() => {
             selectItemHandler(itemData.item.id, itemData.item.title)
           }}
-        >
-          <Button
-            color={Colors.primary}
-            title='View Details'
-            onPress={() => {
-              selectItemHandler(itemData.item.id, itemData.item.title)
-            }}
-          />
-          <Button
-            color={Colors.primary}
-            title='To Cart'
-            onPress={() => {
-              dispatch(addToCart(itemData.item))
-            }}
-          />
-        </ProductItem>
+        />
       )}
     />
   )
 }
-ProductsOverviewScreen.navigationOptions = (navData) => {
+// ProductsOverviewScreen.navigationOptions = (navData)
+export const screenOptions = (navData) => {
   return {
-    headerTitle: 'All products',
+    headerTitle: 'All Products',
     headerLeft: () => (
       <HeaderButtons HeaderButtonComponent={HeaderButton}>
         <Item
@@ -142,11 +168,7 @@ ProductsOverviewScreen.navigationOptions = (navData) => {
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 })
 
 export default ProductsOverviewScreen

@@ -5,7 +5,7 @@ export const SET_ORDERS = 'SET_ORDERS'
 
 export const fetchOrders = () => {
   try {
-    return async (disptach, getState) => {
+    return async (dispatch, getState) => {
       const userId = getState().auth.userId
       const response = await fetch(
         `https://rn-complete-guide-74126.firebaseio.com/orders/${userId}.json`

@@ -9,7 +9,7 @@ import productsReducer from './store/reducers/products'
 import cartReducer from './store/reducers/cart'
 import ordersReducer from './store/reducers/orders'
 import authReducer from './store/reducers/auth'
-import NavigationContainer from './navigation/NavigationContainer'
+import AppNavigator from './navigation/AppNavigator'
 
 const rootReducer = combineReducers({
   products: productsReducer,
@@ -17,6 +17,7 @@ const rootReducer = combineReducers({
   orders: ordersReducer,
   auth: authReducer,
 })
+
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk))
 
 const fetchFonts = () => {
@@ -28,6 +29,7 @@ const fetchFonts = () => {
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false)
+
   if (!fontLoaded) {
     return (
       <AppLoading
@@ -40,7 +42,7 @@ export default function App() {
   }
   return (
     <Provider store={store}>
-      <NavigationContainer />
+      <AppNavigator />
     </Provider>
   )
 }

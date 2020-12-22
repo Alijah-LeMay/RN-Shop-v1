@@ -6,6 +6,7 @@ import HeaderButton from '../../components/UI/HeaderButton'
 import ProductItem from '../../components/shop/ProductItem'
 import Colors from '../../constants/Colors'
 import { deleteProduct } from '../../store/actions/products'
+
 const UserProductsScreen = (props) => {
   const userProducts = useSelector((state) => state.products.userProducts)
   const dispatch = useDispatch()
@@ -13,30 +14,28 @@ const UserProductsScreen = (props) => {
   const editProductHandler = (id) => {
     props.navigation.navigate('EditProduct', { productId: id })
   }
+
   const deleteHandler = (id) => {
-    Alert.alert(
-      'Are yousure?',
-      'Do you really want to delete this item?',
-      {
-        text: 'No',
-        style: 'default',
-      },
+    Alert.alert('Are you sure?', 'Do you really want to delete this item?', [
+      { text: 'No', style: 'default' },
       {
         text: 'Yes',
         style: 'destructive',
         onPress: () => {
           dispatch(deleteProduct(id))
         },
-      }
-    )
+      },
+    ])
   }
+
   if (userProducts.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>No products found, maybe start creating some!</Text>
+        <Text>No products found, maybe start creating some?</Text>
       </View>
     )
   }
+
   return (
     <FlatList
       data={userProducts}
@@ -67,7 +66,9 @@ const UserProductsScreen = (props) => {
     />
   )
 }
-UserProductsScreen.navigationOptions = (navData) => {
+
+// UserProductsScreen.navigationOptions = (navData)
+export const screenOptions = (navData) => {
   return {
     headerTitle: 'Your Products',
     headerLeft: () => (
