@@ -1,12 +1,10 @@
 import React from 'react'
 
-import { View, Text, StyleSheet, Platform, Button } from 'react-native'
+import { View, StyleSheet, Platform } from 'react-native'
 
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
-import { CardStyleInterpolators } from 'react-navigation-stack'
 
 import HeaderButton from '../../components/UI/HeaderButton'
-import Colors from '../../constants/Colors'
 
 import MyButton from '../../components/UI/MyButton'
 
@@ -32,10 +30,10 @@ const MyAccountScreen = (props) => {
     </View>
   )
 }
-
-MyAccountScreen.navigationOptions = (navData) => {
+// MyAccountScreen.navigationOptions = (navData)
+export const screenOptions = (navData) => {
   return {
-    headerTitle: 'My Account',
+    headerTitle: 'Your Account',
     headerLeft: () => (
       <HeaderButtons HeaderButtonComponent={HeaderButton}>
         <Item

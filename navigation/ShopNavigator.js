@@ -28,7 +28,9 @@ import EditProductScreen, {
 import AuthScreen, {
   screenOptions as authScreenOptions,
 } from '../screens/user/AuthScreen'
-import MyAccountScreen from '../screens/user/MyAccountScreen'
+import MyAccountScreen, {
+  screenOptions as myAccountScreenOptions,
+} from '../screens/user/MyAccountScreen'
 import AccountInfoScreen from '../screens/user/AccountInfoScreen'
 
 import Colors from '../constants/Colors'
@@ -46,7 +48,9 @@ const defaultNavOptions = {
   },
   headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primary,
 }
-
+////
+/// Products stack
+///
 const ProductsStackNavigator = createStackNavigator()
 
 const ProductsNavigator = () => {
@@ -70,7 +74,9 @@ const ProductsNavigator = () => {
     </ProductsStackNavigator.Navigator>
   )
 }
-
+////
+/// Orders stack
+///
 const OrdersStackNavigator = createStackNavigator()
 
 const OrdersNavigator = () => (
@@ -83,6 +89,9 @@ const OrdersNavigator = () => (
   </OrdersStackNavigator.Navigator>
 )
 
+////
+/// Accounts stack
+///
 const AccountStackNavigator = createStackNavigator()
 
 const AccountsNavigator = () => (
@@ -90,6 +99,7 @@ const AccountsNavigator = () => (
     <AccountStackNavigator.Screen
       name='MyAccount'
       component={MyAccountScreen}
+      options={myAccountScreenOptions}
     />
     <AccountStackNavigator.Screen
       name='AccountInfo'
@@ -98,10 +108,14 @@ const AccountsNavigator = () => (
   </AccountStackNavigator.Navigator>
 )
 
+////
+/// Admin stack
+///
+
 const AdminStackNavigator = createStackNavigator()
 
 const AdminNavigator = () => (
-  <AdminStackNavigator.Navigator>
+  <AdminStackNavigator.Navigator screenOptions={defaultNavOptions}>
     <AdminStackNavigator.Screen
       name='UserProducts'
       component={UserProductsScreen}
@@ -114,6 +128,30 @@ const AdminNavigator = () => (
     />
   </AdminStackNavigator.Navigator>
 )
+
+////
+/// Auth stack
+///
+
+const AuthStackNavigator = createStackNavigator()
+
+export const AuthNavigator = () => {
+  return (
+    <AuthStackNavigator.Navigator screenOptions={defaultNavOptions}>
+      <AuthStackNavigator.Screen
+        name='Auth'
+        component={AuthScreen}
+        screenOptions={authScreenOptions}
+      />
+    </AuthStackNavigator.Navigator>
+  )
+}
+
+///////////////////////
+///////////////////////
+/////   DRAWER
+//////////////////////
+/////////////////////
 
 const ShopDrawerNavigator = createDrawerNavigator()
 
@@ -172,6 +210,15 @@ export const ShopNavigator = () => {
       <ShopDrawerNavigator.Screen
         name='MyAccount'
         component={AccountsNavigator}
+        options={{
+          drawerIcon: (props) => (
+            <Ionicons
+              name={Platform.OS === 'android' ? 'md-person' : 'ios-person'}
+              size={23}
+              color={props.color}
+            />
+          ),
+        }}
       />
       <ShopDrawerNavigator.Screen
         name='Admin'
@@ -187,20 +234,6 @@ export const ShopNavigator = () => {
         }}
       />
     </ShopDrawerNavigator.Navigator>
-  )
-}
-
-const AuthStackNavigator = createStackNavigator()
-
-export const AuthNavigator = () => {
-  return (
-    <AuthStackNavigator.Navigator screenOptions={defaultNavOptions}>
-      <AuthStackNavigator.Screen
-        name='Auth'
-        component={AuthScreen}
-        screenOptions={authScreenOptions}
-      />
-    </AuthStackNavigator.Navigator>
   )
 }
 
