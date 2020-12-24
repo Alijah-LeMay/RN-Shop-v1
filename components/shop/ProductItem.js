@@ -17,35 +17,32 @@ const ProductItem = (props) => {
     TouchableCmp = TouchableNativeFeedback
   }
   return (
-    <Card styles={styles.product}>
-      <View style={styles.touchable}>
-        <TouchableCmp onPress={props.onSelect} useForeground>
-          <View>
-            <View style={styles.imageContainer}>
-              <Image style={styles.image} source={{ uri: props.image }} />
-            </View>
-            <View style={styles.details}>
-              <Text style={styles.title}>{props.title}</Text>
-              <Text style={styles.price}>${props.price.toFixed(2)}</Text>
-            </View>
-
-            <View style={styles.actions}>{props.children}</View>
+    <Card style={styles.card}>
+      <TouchableCmp onPress={props.onSelect} useForeground>
+        <View style={styles.imageCenter}>
+          <View style={styles.imageContainer}>
+            <Image style={styles.image} source={{ uri: props.image }} />
           </View>
-        </TouchableCmp>
-      </View>
+        </View>
+        <View style={styles.details}>
+          <Text style={styles.title}>{props.title}</Text>
+          <Text style={styles.price}>${props.price.toFixed(2)}</Text>
+        </View>
+
+        <View style={styles.actions}>{props.children}</View>
+      </TouchableCmp>
     </Card>
   )
 }
 
 const styles = StyleSheet.create({
-  product: {
-    height: 300,
-    margin: 20,
+  card: { marginTop: 20, width: '50%' },
+  imageCenter: {
+    alignItems: 'center',
   },
-  touchable: { overflow: 'hidden', borderRadius: 10 },
   imageContainer: {
-    width: '100%',
-    height: '60%',
+    width: '80%',
+    height: 100,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     overflow: 'hidden',
@@ -56,13 +53,10 @@ const styles = StyleSheet.create({
   },
   details: {
     alignItems: 'center',
-    height: '17%',
-    padding: 10,
   },
   title: {
     fontFamily: 'open-sans-bold',
-    fontSize: 18,
-    marginVertical: 4,
+    fontSize: 14,
   },
   price: {
     fontFamily: 'open-sans',
@@ -71,9 +65,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: '23%',
+    justifyContent: 'space-around',
     paddingHorizontal: 20,
   },
 })
