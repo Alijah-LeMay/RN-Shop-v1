@@ -221,7 +221,7 @@ export const ShopNavigator = () => {
         }}
       />
       <ShopDrawerNavigator.Screen
-        name='Admin'
+        name='My Products'
         component={AdminNavigator}
         options={{
           drawerIcon: (props) => (

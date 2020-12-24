@@ -1,6 +1,6 @@
 import { ADD_TO_CART, REMOVE_FROM_CART } from '../actions/cart'
-import CartItem from '../../models/cart-item'
 import { ADD_ORDER } from '../actions/orders'
+import CartItem from '../../models/cart-item'
 import { DELETE_PRODUCT } from '../actions/products'
 
 const initialState = {
@@ -14,9 +14,11 @@ export default (state = initialState, action) => {
       const addedProduct = action.product
       const prodPrice = addedProduct.price
       const prodTitle = addedProduct.title
+
       let updatedOrNewCartItem
+
       if (state.items[addedProduct.id]) {
-        //already have item in cart add additional
+        // already have the item in the cart
         updatedOrNewCartItem = new CartItem(
           state.items[addedProduct.id].quantity + 1,
           prodPrice,
@@ -25,11 +27,11 @@ export default (state = initialState, action) => {
         )
       } else {
         updatedOrNewCartItem = new CartItem(1, prodPrice, prodTitle, prodPrice)
-        return {
-          ...state,
-          items: { ...state.items, [addedProduct.id]: updatedOrNewCartItem },
-          totalAmount: state.totalAmount + prodPrice,
-        }
+      }
+      return {
+        ...state,
+        items: { ...state.items, [addedProduct.id]: updatedOrNewCartItem },
+        totalAmount: state.totalAmount + prodPrice,
       }
     case REMOVE_FROM_CART:
       const selectedCartItem = state.items[action.pid]
